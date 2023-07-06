@@ -42,6 +42,8 @@
 	var/poise = HUMAN_DEFAULT_POISE
 	var/blocking_hand = 0 //0 for main hand, 1 for offhand
 	var/last_block = 0
+	var/nutrition_problems = FALSE
+	var/nutrition_problems_start = 0
 
 /mob/living/carbon/human/Initialize()
 	. = ..()
@@ -683,6 +685,31 @@
 				if(!isnull(mod.metabolism_percent))
 					nutrition_reduction *= mod.metabolism_percent
 			nutrition = max (0, nutrition - nutrition_reduction)
+
+		// body build correction
+		if(nutrition/body_build.stomach_capacity <= STOMACH_FULLNESS_SUPER_LOW)
+			if(!nutrition_problems)
+				nutrition_problems_start = world.time
+				nutrition_problems = 1
+		else if(nutrition/body_build.stomach_capacity >= STOMACH_FULLNESS_SUPER_HIGH)
+			if(!nutrition_problems)
+				nutrition_problems_start = world.time
+				nutrition_problems = 2
+		else
+			nutrition_problems = FALSE
+
+		if(world.time > nutrition_problems_start + (1/5) MINUTES)
+			switch(nutrition_problems)
+				if(1)
+					nutrition_problems = FALSE
+					var/body_build_changed = TRUE
+					if(src.body_build.previous_body_build)
+						for(var/datum/body_build/BB in src.body_build.previous_body_build)
+							if(src.gender in BB.genders)
+								src.change_body_build(BB)
+								break
+					else
+						body_build_changed = FALSE
 
 		// malnutrition \ obesity
 		if(prob(1) && stat == CONSCIOUS && !isSynthetic(src) && !isundead(src))

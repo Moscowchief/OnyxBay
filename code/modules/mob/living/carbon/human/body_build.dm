@@ -37,6 +37,9 @@ var/global/datum/body_build/default_body_build = new
 	var/poise_pool         = HUMAN_DEFAULT_POISE
 	var/stomach_capacity   = STOMACH_CAPACITY_NORMAL
 
+	var/next_body_build //= new /datum/body_build/fat
+	var/previous_body_build //= list(new /datum/body_build/slim/male, new /datum/body_build/slim)
+
 /datum/body_build/proc/get_mob_icon(slot, icon_state)
 	var/icon/I
 	if(!(slot in default_onmob_slots))
@@ -84,6 +87,9 @@ var/global/datum/body_build/default_body_build = new
 	stomach_capacity   = STOMACH_CAPACITY_LOW
 	poise_pool         = HUMAN_LOW_POISE
 
+	next_body_build = new /datum/body_build
+	previous_body_build = new /datum/body_build/slim/alt
+
 /datum/body_build/slim/alt
 	name                 = "Slim Alt"
 	index                = "_slim_alt"
@@ -111,6 +117,9 @@ var/global/datum/body_build/default_body_build = new
 	blood_icon           = 'icons/mob/human_races/masks/blood_human_slim_alt.dmi'
 	dam_mask             = 'icons/mob/human_races/masks/dam_mask_human_slim_alt.dmi'
 
+	//next_body_build = new /datum/body_build/slim
+	//previous_body_build = null
+
 /datum/body_build/slim/male
 	name                 = "Slim"
 	index                = "_slim"
@@ -137,6 +146,9 @@ var/global/datum/body_build/default_body_build = new
 		)
 	blood_icon           = 'icons/mob/human_races/masks/blood_human_m_slim.dmi'
 	dam_mask             = 'icons/mob/human_races/masks/dam_mask_human_m_slim.dmi'
+
+	next_body_build = new /datum/body_build
+	previous_body_build = null
 
 /datum/body_build/fat
 	name                 = "Fat"
@@ -171,6 +183,8 @@ var/global/datum/body_build/default_body_build = new
 	equipment_modifier = 0.5
 	poise_pool         = HUMAN_HIGH_POISE
 
+	next_body_build = null
+	previous_body_build = new /datum/body_build
 
 /datum/body_build/slim/alt/tajaran //*sigh. I regret of doing this.
 	name                 = "Slim Tajaran"
