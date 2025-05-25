@@ -49,7 +49,7 @@
 			E.status &= ~ORGAN_TENDON_CUT
 		if(E.status & ORGAN_BROKEN)
 			E.mend_fracture()
-			E.stage = 0
+			H.surgery_status.set_stage(E, /datum/surgery_step/bone, null)
 
 	H.updatehealth()
 	H.sleeping = 0

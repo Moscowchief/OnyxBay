@@ -19,6 +19,12 @@
 
 	return !parent_organ.is_stump()
 
+/datum/surgery_step/face/proc/set_stage(mob/living/carbon/human/target, obj/item/organ/external/target_organ, stage)
+	target.surgery_status.set_stage(target_organ, /datum/surgery_step/face, stage)
+	
+/datum/surgery_step/face/proc/get_stage(mob/living/carbon/human/target, obj/item/organ/external/target_organ)
+	return target.surgery_status.get_stage(target_organ, /datum/surgery_step/face)
+
 /**
  * Facial tissue cutting step.
  */
@@ -36,7 +42,7 @@
 	failure_sound = 'sound/weapons/bladeslice.ogg'
 
 /datum/surgery_step/face/cut_face/check_parent_organ(obj/item/organ/external/parent_organ, mob/living/carbon/human/target, obj/item/tool, atom/user)
-	return target.surgery_status.face == 0
+	return get_stage(target, parent_organ) == null
 
 /datum/surgery_step/face/cut_face/initiate(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_preop(user,
@@ -50,7 +56,7 @@
 		"[user] has cut open [target]'s face and neck with \the [tool].",
 		"You have cut open [target]'s face and neck with \the [tool]."
 		)
-	target.surgery_status.face = 1
+	set_stage(target, parent_organ, CUT_FACE)
 
 /datum/surgery_step/face/cut_face/failure(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_failure(user,
@@ -82,7 +88,7 @@
 	failure_sound = 'sound/surgery/hatchet.ogg'
 
 /datum/surgery_step/face/mend_vocal/check_parent_organ(obj/item/organ/external/parent_organ, mob/living/carbon/human/target, obj/item/tool, atom/user)
-	return (..() && target.surgery_status.face == 1)
+	return (..() && get_stage(target, parent_organ) == CUT_FACE)
 
 /datum/surgery_step/face/mend_vocal/initiate(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_preop(user,
@@ -96,7 +102,7 @@
 		"[user] mends [target]'s vocal cords with \the [tool].",
 		"You mend [target]'s vocal cords with \the [tool]."
 		)
-	target.surgery_status.face = 2
+	set_stage(target, parent_organ, MEND_VOCAL)
 
 /datum/surgery_step/face/mend_vocal/failure(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_failure(user,
@@ -122,7 +128,7 @@
 	failure_sound = 'sound/weapons/bladeslice.ogg'
 
 /datum/surgery_step/face/fix_face/check_parent_organ(obj/item/organ/external/parent_organ, mob/living/carbon/human/target, obj/item/tool, atom/user)
-	return (..() && target.surgery_status.face == 2)
+	return (..() && get_stage(target, parent_organ) == MEND_VOCAL)
 
 /datum/surgery_step/face/fix_face/initiate(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_preop(user,
@@ -135,7 +141,7 @@
 		"[user] pulls the skin on [target]'s face back in place with \the [tool].",
 		"You pull the skin on [target]'s face back in place with \the [tool]."
 		)
-	target.surgery_status.face = 3
+	set_stage(target, parent_organ, FIX_FACE)
 
 /datum/surgery_step/face/fix_face/failure(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_failure(user,
@@ -168,7 +174,7 @@
 	failure_sound = 'sound/surgery/cautery.ogg'
 
 /datum/surgery_step/face/cauterize/check_parent_organ(obj/item/organ/external/parent_organ, mob/living/carbon/human/target, obj/item/tool, atom/user)
-	return (..() && target.surgery_status.face > 0)
+	return (..() && get_stage(target, parent_organ))
 
 /datum/surgery_step/face/cauterize/initiate(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)
 	announce_preop(user,
@@ -182,11 +188,11 @@
 		"[user] cauterizes the incision on [target]'s face and neck with \the [tool].",
 		"You cauterize the incision on [target]'s face and neck with \the [tool]."
 		)
-	if(target.surgery_status.face == 3)
+	if(get_stage(target, parent_organ) == FIX_FACE)
 		var/obj/item/organ/external/head/H = parent_organ
 		H.status &= ~ORGAN_DISFIGURED
 		H.deformities = 0
-	target.surgery_status.face = 0
+	set_stage(target, parent_organ, null)
 	target.update_deformities()
 
 /datum/surgery_step/face/cauterize/failure(obj/item/organ/external/parent_organ, obj/item/organ/target_organ, mob/living/carbon/human/target, obj/item/tool, mob/user)

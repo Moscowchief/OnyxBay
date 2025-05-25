@@ -23,3 +23,12 @@
 #define STERILIZATION_DURATION  55
 #define DETACH_DURATION         52
 #define TREAT_NECROSIS_DURATION 26
+
+///Facial reconstruction surgery
+#define CUT_FACE 1
+#define MEND_VOCAL 2
+#define FIX_FACE 3
+
+///Bone surgery
+#define GLUE_BONE 1
+#define MEND_BONE 2

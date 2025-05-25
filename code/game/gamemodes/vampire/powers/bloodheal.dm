@@ -90,7 +90,7 @@
 				organ_heal_blood += 12
 			if(E.status & ORGAN_BROKEN)
 				E.mend_fracture()
-				E.stage = 0
+				my_mob.surgery_status.set_stage(E, /datum/surgery_step/bone, null)
 				organ_heal_blood += 12
 				healed = TRUE
 
